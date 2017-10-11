@@ -31,22 +31,18 @@
             <div class="Catalogtitwo">题号：25544&nbsp;&nbsp;题型：还是得&nbsp;&nbsp;难度：订餐&nbsp;&nbsp;上传人：女性司机&nbsp;&nbsp;来源：才能使得&nbsp;&nbsp;上传时间:220255&nbsp;&nbsp;组卷次数：<em>0</em></div>
               <div class="Catalogcontent">
                   <div class="Catalogcontentup">题型</div>
-                  <div class="Catalogcontentdown">
+                  <div class="Catalogcontentdown" style="display:block;">
                     <a href="javascript:void(0)">审核通过</a>
                     <a href="javascript:void(0)">审核不通过</a>
                     <a href="javascript:void(0)">删除题目</a>
-                </div>
-            </div>
-        </div>
-        <div class="Catalog_rightnei" hidden>
-          <div class="Catalogtitwo">题号：25544&nbsp;&nbsp;题型：还是得&nbsp;&nbsp;难度：订餐&nbsp;&nbsp;上传人：女性司机&nbsp;&nbsp;来源：才能使得&nbsp;&nbsp;上传时间:220255&nbsp;&nbsp;组卷次数：<em>0</em></div>
-          <div class="Catalogcontent">
-            <div class="Catalogcontentup">题型</div>
-            <div class="Catalogcontentdown"><a href="#">加入试卷</a></div>
-          </div>
+                  </div>
+                  <div class="Catalogcontentdown" style="display:none;">
+                    <a href="javascript:void(0)">加入试卷</a>
+                  </div>
+              </div>
         </div>
       </div>
-      <div class="clear"></div>
+      <!-- <div class="clear"></div> -->
     </div>
   </div>
 </div>
@@ -55,7 +51,7 @@
     //点击 单个添加题目，显示页面
     $('.icon_add').off();
     $('.icon_add').on('click',function(){
-      $('.Catalog_rightnei').removeAttr('hidden');
+      $('.Catalog_rightnei:eq(0)').removeAttr('hidden');
     });
 
     /*$.getJSON('exam/manage/getAllSubjectType',function(data){
@@ -139,10 +135,16 @@
           $('tr:nth-child(5) .chose').append(a);
         });
       });
+      
+    //筛选条件
+    //显示题目
     //事件代理，给a添加点击事件，并拿到id，传入到后台
+    var state;  //表示点击状态
     $('.tablea').off();
     $('.tablea').on('click','a',function(){
+      state = "off";
       $(this).addClass('active3').siblings().removeClass('active3');
+      $('.Catalog_rightnei:eq(0)').removeAttr('hidden');
       // console.log(this.id);
       //将id放入一个数组中
       var arr = $('.tablea').find('a').filter(':visible').map(function(index,item){
@@ -155,13 +157,65 @@
       //将拿到的4个id传入到后台
       $.post('exam/manage/getAllSubjects',{ids:arr},function(data){
         // console.log(data);
+        //显示题目
         data.forEach(function(item){
           // var ele = $('题型<br><span>'+item.analysis+'</span>');
-          $('.Catalogcontentup').eq(0).html('<span id='+item.id+'>题型<br>'+item.stem+'</span>');
+          $('.Catalogcontentup:eq(0)').html('<span subjectType_id='+item.subjectType_id+' id='+item.id+'>题目为:&nbsp;'+item.stem+'</span>');
         });
       });
     });
+
+    //选中选框显示答案或不显示答案
+    $('.Catalogtitle').find(':checkbox').change(function(){
+      if($(this).prop('checked')){
+        showAnswer();
+      }else{
+        $('ol').remove();
+      }
+    });
+
+    //点击题面显示或不显示答案  未完成
+    $('.Catalogcontentup:eq(0)').off();
+    $('.Catalogcontentup:eq(0)').on('click','span',function(){
+      if(state == "off"){
+        showAnswer();
+        // $('input:checkbox').attr('checked','true');  //表示选中选框
+        state = "on";
+      }else if(state == "on"){
+        $('ol').remove();
+        // $('input:checkbox').removeAttr('checked','false');  //取消选中选框
+        state = "off";
+      }
+    });
+
+    //展示答案
+    function showAnswer(){
+      var subjectTypeId = $('.Catalogcontentup:eq(0) span').attr('subjectType_id');
+      if(subjectTypeId<3){
+        var id = $('.Catalogcontentup:eq(0) span').attr('id');
+        console.log(id);
+        $.post('exam/manage/getAnswer',{'id':id},function(data){
+          // console.log(data);
+          var newOl = $('<ol type="A" style="margin-left:70px;"></ol>');
+          $('.Catalogcontentup:eq(0)').append(newOl);
+          data.forEach(function(item){
+            // console.log(item);
+            var cor = item.correct.data;  //数组
+            var corr = cor.toString();  //将数组转换为字符串
+            // console.log(cor,corr);
+            if(corr == '1'){
+              var newLi = ('<li style="margin-top:5px;color:red;">'+item.content+'</li>');                
+            }else{
+              var newLi = ('<li style="margin-top:5px;">'+item.content+'</li>');
+            }
+            $('.Catalogcontentup:eq(0) ol').append(newLi);
+          });
+        });
+      }
+    }
+
     //为审核等3个按钮添加事件
+    $("a:contains('审核通过')").off();
     $("a:contains('审核通过')").on('click',function(){
       var id = $('.Catalogcontentup:eq(0) span').attr('id');
       var checkState = '通过';
@@ -169,9 +223,12 @@
         'subject.id':id,
         'subject.checkState':checkState
       },function(){
-        alert('审核通过！');
+        // alert('审核通过！');
+        $('.Catalogcontentdown:eq(0)').css('display','none').siblings().css('display','block');
+        $('.Catalogcontentdown:eq(1)').css('display','block');
       });
     });
+    $("a:contains('审核不通过')").off();
     $("a:contains('审核不通过')").on('click',function(){
       var id = $('.Catalogcontentup:eq(0) span').attr('id');
       var checkState = '不通过';
@@ -182,6 +239,7 @@
         alert('审核未通过！');
       });
     });
+    $("a:contains('删除题目')").off();
     $("a:contains('删除题目')").on('click',function(){
       var id = $('.Catalogcontentup:eq(0) span').attr('id');
       $.post('exam/manage/delSubject',{'id':id},function(){
@@ -189,6 +247,54 @@
         location.reload();
       });
     });
+
+    //模糊查询
+    $("span:contains('查找')").off();
+    $("span:contains('查找')").on('click',function(){
+      state = "off";
+      var key = $('input:text').val();
+      // console.log(key);
+      $.getJSON('exam/manage/queryByKey/'+key,function(data){
+        data.forEach(function(item){
+          $('.Catalogcontentup:eq(0)').html('<span subjectType_id='+item.subjectType_id+' id='+item.id+'>题目为:&nbsp;'+item.stem+'</span>');          
+        });
+      });
+      $('.Catalog_rightnei:eq(0)').removeAttr('hidden');
+    });
+
+    //展示答案
+    /*function showAnswer(data){
+      data.forEach(function(item){
+        // console.log(item.answer);
+        // console.log(item.subjectType_id);
+        var ansArr = item.answer.split(',');
+        // console.log(ansArr);
+        var newOl = $('<ol type="A" style="margin-left:70px;"></ol>');
+        switch(item.subjectType_id){
+          case 1:
+            $('.Catalogcontentup:eq(0)').append(newOl);
+            for(var i=0; i<ansArr.length; i++){
+              var newLi = $('<li style="margin-top:5px;">'+ansArr[i]+'</li>');
+              // console.log(newLi);
+              $('.Catalogcontentup:eq(0) ol').append(newLi);
+            }
+            break;
+          case 2:
+            $('.Catalogcontentup:eq(0)').append(newOl);
+            for(var i=0; i<ansArr.length; i++){
+              var newLi = $('<li style="margin-top:5px;">'+ansArr[i]+'</li>');
+              // console.log(newLi);
+              $('.Catalogcontentup:eq(0) ol').append(newLi);
+            }
+            break;
+          case 3:
+            var ans3 = $('<p style="width:300px;color:red;word-wrap:break-word;padding-left:70px;">'+item.answer+'</p>');
+            $('.Catalogcontentup:eq(0').append(ans3); 
+            break;
+        }
+      });
+    }*/
+    
 
   });
 </script>

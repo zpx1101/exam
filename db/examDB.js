@@ -28,5 +28,14 @@ module.exports = {
 	delSubject(id){
 		var sql = "delete from tbl_exam_subject where id="+id;
 		return pool.execute(sql);
+	},
+	getAnswer(subject_id){
+		var sql = "select * from tbl_exam_choice where subject_id="+subject_id;
+		return pool.execute(sql);
+	},
+	query(key){
+		var sql = "select * from tbl_exam_subject where stem like '%"
+		+key+"%'";
+		return pool.execute(sql);
 	}
 }

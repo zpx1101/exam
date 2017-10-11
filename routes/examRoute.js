@@ -67,6 +67,30 @@ route.post('/delSubject',(req,resp)=>{
 		resp.send(err);
 	});
 });
+//展示答案
+route.post('/getAnswer',(req,resp)=>{
+	var id = req.body['id'];
+	// console.log(id);
+	// console.log(req.body);
+	examDB.getAnswer(id).then((data)=>{
+		// console.log(data);
+		resp.send(data);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+});
+//模糊查询
+route.get('/queryByKey/:keys',(req,resp)=>{
+	var key = req.params.keys;
+	// console.log(key);
+	// console.log(req.params);
+	examDB.query(key).then((data)=>{
+		// console.log(data);
+		resp.send(data);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+});
 function newArr(a){
     var arr = [];
     return arr.concat(a);
