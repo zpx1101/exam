@@ -1,7 +1,9 @@
 var express = require('express');
 var route = express.Router();
 var examDB = require('../db/examDB');
+var Subject = require('../model/Subject');
 
+//类型
 route.get('/getAllSubjectType',(req,resp)=>{
 	examDB.getAllSubjectType().then((data)=>{
 		resp.send(data);
@@ -9,6 +11,7 @@ route.get('/getAllSubjectType',(req,resp)=>{
 		resp.send(err);
 	});
 });
+//难度
 route.get('/getAllSubjectLevel',(req,resp)=>{
 	examDB.getAllSubjectLevel().then((data)=>{
 		resp.send(data);
@@ -16,6 +19,7 @@ route.get('/getAllSubjectLevel',(req,resp)=>{
 		resp.send(err);
 	});
 });
+//方向
 route.get('/getAllDepartments',(req,resp)=>{
 	examDB.getAllDepartments().then((data)=>{
 		resp.send(data);
@@ -23,6 +27,7 @@ route.get('/getAllDepartments',(req,resp)=>{
 		resp.send(err);
 	});
 });
+//知识点
 route.get('/getAllTopics',(req,resp)=>{
 	examDB.getAllTopics().then((data)=>{
 		resp.send(data);
@@ -30,7 +35,7 @@ route.get('/getAllTopics',(req,resp)=>{
 		resp.send(err);
 	});
 });
-
+//获取题目
 route.post('/getAllSubjects',(req,resp)=>{
 	var ids = newArr(req.body['ids[]']);
 	// console.log(ids);
@@ -85,6 +90,31 @@ route.get('/queryByKey/:keys',(req,resp)=>{
 	// console.log(key);
 	// console.log(req.params);
 	examDB.query(key).then((data)=>{
+		// console.log(data);
+		resp.send(data);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+});
+//拿到解析
+route.get('/getAnalysis',(req,resp)=>{
+	var id = req.query.id;
+	// console.log(id);
+	// console.log(req.query);
+	examDB.getAnalysis(id).then((data)=>{
+		// console.log(data);
+		resp.send(data);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+});
+//添加题目
+route.post('/addSubject',(req,resp)=>{
+	let subject = new Subject();
+	Object.assign(subject,req.body);
+	// console.log(subject);
+	// console.log(req.body);
+	examDB.addSubject(subject).then((data)=>{
 		// console.log(data);
 		resp.send(data);
 	}).catch((err)=>{

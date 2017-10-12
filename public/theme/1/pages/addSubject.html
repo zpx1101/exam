@@ -1,0 +1,268 @@
+<style>
+	.Attributecontent_left select{width:100px}
+	textarea,input{font-size:12px;}
+	.Answerpart_right textarea,.Problemcontent textarea{width:90%;height:70%;border:none;padding:10px;}
+	.chapterAnswer{ display:none;}
+</style>
+
+		<!--题目添加-->
+<div class="editingarea">
+<form action="" action="post" name="subjectAddForm">
+	<div class="c_flex"><span class="c_flexible"></span></div>
+	<div class="chosetitle"><a href="#" class="deletetitle">删除</a></div>
+	
+	<div class="c_editview">
+		<div class="Attribute">
+				<div class="Attributetit">题目属性</div>
+				<div class="Attributecontent">
+					<div class="Attributecontent_left">
+						<b>
+						题型：<select name="type">
+						</select>
+						</b>
+						<b>
+						方向：<select name="department">
+							
+						</select>
+						</b>
+						<b>
+						难度：<select name="level">
+							
+						</select>
+						</b>
+						<b>
+						知识点：<select name="topic">
+						</select>
+						</b> 
+					</div>              
+				</div>
+		</div>
+		<div class="Problem">
+			<div class="Attributetit">题目题干</div>
+			<div>
+				<textarea name="stem" cols="80" rows="4"></textarea>                              
+			</div>
+		</div>
+		<div class="Answeroptions">
+			<div class="Attributetit">答案选项<em>(通过勾选每个选项下面的框可以设置正确答案)</em></div>
+			<div class="c_condition">
+				<span class="icon_add"><em class="icon_r" style="float: left">添加选项</em></span>
+			</div>
+			<div class="Answercontent">
+				<!--选项-->
+				<div class="Answerpart">
+						<div class="Answerpart_left">
+							<p>A</p><span>
+							<input type="radio" name="answer"/></span>
+						</div>
+						<div class="Answerpart_right">
+						<textarea name="choiceContent"></textarea>   
+						</div>
+						<div class="clear"></div>
+				</div>
+				<div class="Answerpart">
+					<div class="Answerpart_left">
+						<p>B</p><span>
+						<input type="radio" name="answer"/>
+						</span>
+					</div>
+					<div class="Answerpart_right">
+						<textarea name="choiceContent"></textarea>  
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="Answerpart">
+					<div class="Answerpart_left">
+						<p>C</p><span>
+						<input type="radio" name="answer"/>
+						</span>
+					</div>
+					<div class="Answerpart_right">
+						<textarea name="choiceContent"></textarea>  
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="Answerpart">
+					<div class="Answerpart_left">
+						<p>D</p><span>
+						<input type="radio" name="answer"/>
+						</span>
+					</div>
+					<div class="Answerpart_right">
+						<textarea name="choiceContent"></textarea>  
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="Problem chapterAnswer">
+			<div class="Attributetit">答案</div>
+			<div class="Problemcontent">
+				<textarea name="answer"></textarea> 
+			</div>
+		</div>
+		
+		<div class="Problem">
+			<div class="Attributetit">答案解析</div>
+			<div class="Problemcontent">
+				<textarea name="analysis"></textarea> 
+			</div>
+		</div>
+		<div class="btn_left">
+			<span class="btnL"><em class="btnR saveContinue">保存并继续</em></span>
+			<span class="btnL"><em class="btnR saveClose">保存并关闭</em></span>
+		</div>
+	</div>
+</form>
+</div>
+                
+<script>
+	$(function(){
+		//点击右上角×号，返回showSubject.html
+		$(".deletetitle").on('click',function(){
+			$(".right").load("theme/1/pages/showSubject.html");
+		});
+		//获取下拉列表中的内容
+		//题型
+		$.getJSON('exam/manage/getAllSubjectType',function(data){
+			$('select:eq(0)').empty();
+			data.forEach(function(item,index){
+				var opts = $('<option id='+item.id+' name="'+item.name+'" value="'+item.id+'">'+item.realName+'</option>');
+				$('select:eq(0)').append(opts);
+			});
+		});
+		//方向
+		$.getJSON('exam/manage/getAllDepartments',function(data){
+			$('select:eq(1)').empty();
+			data.forEach(function(item,index){
+				var opts = $('<option id='+item.id+' value="'+item.id+'">'+item.name+'</option>');
+				$('select:eq(1)').append(opts);
+			});
+		});
+		//难度
+		$.getJSON('exam/manage/getAllSubjectLevel',function(data){
+			$('select:eq(2)').empty();
+			data.forEach(function(item,index){
+				var opts = $('<option id='+item.id+' value="'+item.id+'">'+item.realName+'</option>');
+				$('select:eq(2)').append(opts);
+			});
+		});
+		//知识点
+		$.getJSON('exam/manage/getAllTopics',function(data){
+			$('select:eq(3)').empty();
+			data.forEach(function(item,index){
+				var opts = $('<option id='+item.id+' value="'+item.id+'">'+item.title+'</option>');
+				$('select:eq(3)').append(opts);
+			});
+		});
+
+		//根据题型下拉框改变页面
+		$("select[name='type']").off();
+		$("select[name='type']").on('change',function(){
+			var val = $(this).val();
+			// console.log(val);
+			switch(val){
+				case '1':
+					$('.Answeroptions').css('display','block');
+					$(".Answerpart .Answerpart_left input").attr("type","radio");
+					break;
+				case '2':
+					$('.Answeroptions').css('display','block');
+					$(".Answerpart .Answerpart_left input").attr("type","checkbox");
+					break;
+				case '3':
+					$('.Answeroptions').css('display','none');
+					$('.chapterAnswer').css('display','block');
+					break;
+			}
+		});
+
+		
+		$("form[name='subjectAddForm']").submit(function(){
+			return false;   //阻止默认事件
+		});
+
+		//添加题目
+		function add(){
+			var typeId = $("select[name='type']").val();
+			var departmentId = $("select[name='department']").val();
+			var levelId = $("select[name='level']").val();
+			var topicId = $("select[name='topic']").val();
+			var stem = $("textarea[name='stem']").val();
+			var analysis = $("textarea[name='analysis']").val();
+			var answer;
+			if(typeId == 1 || typeId == 2){
+				answer = $("textarea[name='choiceContent']").map(function(index,item){
+					return $(item).val();
+				}).toArray();
+			}else{
+				answer = $("textarea[name='answer']").val();
+			}
+			console.log(answer);
+			//将数组转换为字符串  判断答案是单选，复选或简答
+			var result = Array.isArray(answer)?answer.join():answer;
+			// console.log(result);
+			var newSub = {
+				typeId:typeId,
+				departmentId:departmentId,
+				levelId:levelId,
+				topicId:topicId,
+				stem:stem,
+				analysis:analysis,
+				answer:result
+			}
+			// console.log(newSub);
+			$.ajax('exam/manage/addSubject',{
+				'data':newSub,
+				'method':'POST',
+				'content-Type':'application/json',
+				success:function(data){
+					console.log(data);
+				}
+			});
+		}
+
+		//保存继续
+		$('.saveContinue').off();
+		$('.saveContinue').on('click',function(){
+			add();
+			$('.right').load('theme/1/pages/addSubject.html');
+			
+		});
+		//保存关闭
+		$('.saveClose').off();
+		$('.saveClose').on('click',function(){
+			add();
+			$(".deletetitle").trigger('click');
+		});
+	});
+</script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
