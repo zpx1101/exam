@@ -1,7 +1,7 @@
 var express = require('express');
 var route = express.Router();
 var examDB = require('../db/examDB');
-var Subject = require('../model/Subject');
+// var Subject = require('../model/Subject');
 
 //类型
 route.get('/getAllSubjectType',(req,resp)=>{
@@ -110,11 +110,33 @@ route.get('/getAnalysis',(req,resp)=>{
 });
 //添加题目
 route.post('/addSubject',(req,resp)=>{
-	let subject = new Subject();
-	Object.assign(subject,req.body);
-	// console.log(subject);
+	// let subject = new Subject();
+	// Object.assign(subject,req.body);
+	var info = req.body;
+	var subject = {
+		typeId:info['typeId'],
+		departmentId:info['departmentId'],
+		levelId:info['levelId'],
+		topicId:info['topicId'],
+		stem:info['stem'],
+		analysis:info['analysis'],
+		answer:info['answer']
+	}
 	// console.log(req.body);
+	// console.log(subject);
 	examDB.addSubject(subject).then((data)=>{
+		// console.log(data);
+		resp.send(data);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+});
+//添加choices
+route.post('/addChoice',(req,resp)=>{
+	var content = req.body['content[]'];
+	var correct = req.body['correct[]'];
+	var subjectId = req.body['subjectId'];
+	examDB.addChoice(content,correct,subjectId).then((data)=>{
 		// console.log(data);
 		resp.send(data);
 	}).catch((err)=>{

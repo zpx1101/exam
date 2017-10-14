@@ -178,7 +178,7 @@
 			}
 		});
 
-		
+		//阻止表单默认提交事件
 		$("form[name='subjectAddForm']").submit(function(){
 			return false;   //阻止默认事件
 		});
@@ -196,12 +196,12 @@
 				answer = $("textarea[name='choiceContent']").map(function(index,item){
 					return $(item).val();
 				}).toArray();
+				// console.log(answer);
+				//将数组转换为字符串
+				result = answer.toString();
 			}else{
-				answer = $("textarea[name='answer']").val();
+				result = $("textarea[name='answer']").val();
 			}
-			console.log(answer);
-			//将数组转换为字符串  判断答案是单选，复选或简答
-			var result = Array.isArray(answer)?answer.join():answer;
 			// console.log(result);
 			var newSub = {
 				typeId:typeId,
@@ -218,7 +218,32 @@
 				'method':'POST',
 				'content-Type':'application/json',
 				success:function(data){
-					console.log(data);
+					//获取答案的choices
+					var choice = [];
+					if(typeId == 1){
+						$(":radio[name='answer']").each(function(index,item){
+							choice[index] = +$(item).prop("checked");
+						});
+						content = answer;
+					}else if(typeId == 2){
+						$(":checkbox[name='answer']").each(function(index,item){
+							choice[index] = +$(item).prop("checked");
+						});
+						content = answer;				
+					}else{
+						choice[0] = 1;
+						content = result.split();
+					}
+					console.log(choice);
+					// console.log(content);
+					var subjectId = data.insertId; 
+					$.post('exam/manage/addChoice',{
+						content:content,
+						correct:choice,
+						subjectId:subjectId
+					},function(data){
+						console.log(data);
+					});
 				}
 			});
 		}

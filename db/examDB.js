@@ -62,5 +62,12 @@ module.exports = {
 		+subject.typeId+","
 		+subject.topicId+");";
     	return pool.execute(sql);
+	},
+	addChoice(content,correct,subjectId){
+		for(var i=0; i<content.length; i++){
+			// console.log(i);
+			var sql = "insert into tbl_exam_choice values(null,'"+content[i]+"',"+correct[i]+","+subjectId+")";
+			return pool.execute.call(sql);
+		}
 	}
 }
