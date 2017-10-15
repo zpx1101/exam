@@ -93,7 +93,6 @@
 					</div>
 					<div class="clear"></div>
 				</div>
-				<div class="clear"></div>
 			</div>
 		</div>
 		<div class="Problem chapterAnswer">
@@ -178,6 +177,17 @@
 			}
 		});
 
+		//添加选项
+		$('.icon_add').off();
+		$('.icon_add').on('click',function(){
+			var optClone = $('.Answercontent>div:last-child').clone();	
+			var con = optClone.find('p').html();
+			var conCode = con.charCodeAt();  //将字符转换为字符编码
+			var newCode = String.fromCharCode(conCode+1);  //将字符编码转换为字符
+			optClone.find('p').html(newCode);
+			$('.Answercontent').append(optClone);	
+			// console.log(con,conCode);
+		});
 		//阻止表单默认提交事件
 		$("form[name='subjectAddForm']").submit(function(){
 			return false;   //阻止默认事件
